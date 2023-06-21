@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const bcryptjs = require('bcryptjs');
  
 // Mongoose schema using new mongoose.Schema( command create userSchema and define name, email and all other fields required) ***** 
 
@@ -28,6 +29,16 @@ const userSchema = new mongoose.Schema({
         required: true
     }
 })
+
+// Bcryptjs ka use krke password hash kr rkha hai jaki koi bhi password hack na kr le *********
+
+userSchema.pre('save', async function (next) {
+    if (this.isModified('password')) {
+        this.password = await bcryptjs.hash(this.password, 12);
+        this.confirmpassword = await bcryptjs.hash(this.confirmpassword, 12);
+    }
+    next();
+});
 
 // Mongoose schema using new mongoose.Schema( command create userSchema and define name, email and all other fields required) *****
 

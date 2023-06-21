@@ -11,6 +11,8 @@ router.get('/', (req, res) => {
     res.send('router hello');
 });
 
+//  Registeration ka code :--------------------------------
+
 router.post('/register', async (req, res) => {
     const { name, email, phoneNo, work, password, confirmpassword } = req.body;
     
@@ -35,6 +37,7 @@ router.post('/register', async (req, res) => {
     //     console.log(err);
     // });
 
+    // async await function for create user data and create new data ***********************
 
     try {
         const userExist = await User.findOne({ email: email });
@@ -44,7 +47,9 @@ router.post('/register', async (req, res) => {
         }
 
         const user = new User({ name, email, phoneNo, work, password, confirmpassword });
-
+   
+    //   yha pr wo bcyptjs wala code use hora hai *************
+        
         await user.save();
 
         res.json({ error: 'new user created' });
@@ -53,5 +58,33 @@ router.post('/register', async (req, res) => {
         console.log(err);
     }
 });
+
+
+
+//  Login ka code :------------------------------------------
+
+router.post('/signin', async (req, res) => {
+       
+        try {
+            const { email, password} = req.body;
+
+            if (!email || !password)
+            {
+               return res.json({ message : 'Invalid'})
+            }
+            
+            const userLogin = await User.findOne({ email: email })
+            console.log(userLogin);
+
+            if (!userLogin)
+            {
+                res.json({ message: 'not register' });
+                }else
+            {res.json({ message: 'Successful' });}
+        } catch (err) {
+            console.log(err);
+        }
+    });
+
 
 module.exports = router;

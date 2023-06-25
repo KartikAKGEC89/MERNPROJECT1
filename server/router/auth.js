@@ -44,15 +44,21 @@ router.post('/register', async (req, res) => {
         
         if (userExist) {
            return res.status(422).json({ error: 'User already exist !!' });
-        }
-
+        } else if (password != confirmpassword) {
+            return res.json({ message: 'Not created' });
+        } else {
+            
+            
         const user = new User({ name, email, phoneNo, work, password, confirmpassword });
    
     //   yha pr wo bcyptjs wala code use hora hai *************
         
         await user.save();
 
-        res.json({ error: 'new user created' });
+            res.json({ error: 'new user created' });
+            
+        }
+
 
     } catch (err) {
         console.log(err);

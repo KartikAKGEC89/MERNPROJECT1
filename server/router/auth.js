@@ -1,4 +1,6 @@
 const express = require('express');
+const bcrypt = require('bcryptjs');
+const token = require("jsonwebtoken");
 
 // Route define so make app.js code more read able *******
 
@@ -79,14 +81,39 @@ router.post('/signin', async (req, res) => {
                return res.json({ message : 'Invalid'})
             }
             
-            const userLogin = await User.findOne({ email: email })
+            const userLogin = await User.findOne({ email: email });
+
+//  Token part ************************************************************************************************
+            
+            const token = await userLogin.generateAuthToken();
+            console.log(token);
             console.log(userLogin);
 
-            if (!userLogin)
+//  Token part ************************************************************************************************
+
+//   Cookies store krane ka tarika backend me. check krane ke liye ki ye authenticated user hai ya nhi ********
+            
+            res.cookie('jwttoken', token, {
+                expires: new Date(Date.now() + 5822000),
+                httpOnly: true
+            })
+
+//   Cookies store krane ka tarika backend me. check krane ke liye ki ye authenticated user hai ya nhi ********
+
+            if (userLogin)
+            {const ismatch = await bcrypt.compare(password, userLogin.password);
+
+            if (!ismatch)
             {
-                res.json({ message: 'not register' });
+                res.json({ message: 'Invalid' });
                 }else
-            {res.json({ message: 'Successful' });}
+            {res.json({ message: 'Successful' });
+                
+                }
+
+            }else {
+                     res.json({ message: 'Invalid' });
+                }
         } catch (err) {
             console.log(err);
         }

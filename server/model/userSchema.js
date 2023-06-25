@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const bcryptjs = require('bcryptjs');
+const jwt = require("jsonwebtoken");
  
 // Mongoose schema using new mongoose.Schema( command create userSchema and define name, email and all other fields required) ***** 
 
@@ -27,7 +28,17 @@ const userSchema = new mongoose.Schema({
     confirmpassword: {
         type: String,
         required: true
-    }
+    },
+    // Token For save in mongoDB ***********************************************
+    tokens: [
+        {token:{
+            type: String,
+            require:true
+        }}
+    ]
+
+    // Token For save in mongoDB ***********************************************
+
 })
 
 // Bcryptjs ka use krke password hash kr rkha hai jaki koi bhi password hack na kr le *********
@@ -39,6 +50,19 @@ userSchema.pre('save', async function (next) {
     }
     next();
 });
+
+//  JswonWeb token apply in schema remain part in login route *******************************************************************
+
+userSchema.methods.generateAuthToken = async function () {
+    try {
+        let token = jwt.sign({ _id: this._id }, process.env.SECRET_KEY);
+        this.tokens = this.tokens.concat({ token: token });
+        await this.save();
+        return token;
+    } catch (err) {
+        console.log(err);    
+    }
+}
 
 // Mongoose schema using new mongoose.Schema( command create userSchema and define name, email and all other fields required) *****
 
